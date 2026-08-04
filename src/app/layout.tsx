@@ -8,6 +8,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang='en'
     // className={`${inter.variable} ${unbounded.variable}`} // fonts
+    data-scroll-behavior="smooth"
     >
       <body>
         {/* <Providers> */}
