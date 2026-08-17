@@ -1,5 +1,6 @@
 import { PREFIX } from '@/constants/const';
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
+import path from 'path';
 
 const nextConfig: NextConfig = {
   compress: true,
@@ -8,11 +9,12 @@ const nextConfig: NextConfig = {
   assetPrefix: PREFIX,
   reactStrictMode: true,
   images: {
-    unoptimized: true
+    unoptimized: true,
   },
   trailingSlash: true,
   sassOptions: {
-    // prependData: `@use '@/styles/abstracts' as *;`,
+    loadPaths: [path.join(__dirname, 'src/styles').replace(/\\/g, '/')],
+    prependData: `@use 'abstracts' as *;`,
   },
 };
 
