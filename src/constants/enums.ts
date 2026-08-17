@@ -44,3 +44,8 @@ export enum OpenElement {
   MODAL_ELEMENT = 'MODAL_ELEMENT',
   ASIDE = 'ASIDE',
 }
+
+// %------------------------ api ------------------------% //
+export enum API_Route {
+  route = '/posts',
+}
