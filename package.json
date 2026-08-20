@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build",
+    "dev": "npm run clean && concurrently \"next dev\" \"npm run watch:images\"",
+    "clean": "node -e \"const fs = require('node:fs'); ['.next', 'tsconfig.tsbuildinfo'].forEach((path) => fs.rmSync(path, { recursive: true, force: true }))\"",
+    "watch:images": "node scripts/watch-images.mjs",
+    "generate:images": "node scripts/generate-images.mjs",
+    "prebuild": "npm run clean && npm run generate:images",
+    "build": "npm run build:compile && npm run build:env",
+    "build:compile": "cross-env NODE_OPTIONS=--max-old-space-size=1024 next build --webpack --experimental-build-mode=compile",
+    "build:env": "next build --webpack --experimental-build-mode=generate-env",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "npm run clean && eslint .",
     "lint:fix": "eslint . --fix"
   },
   "browserslist": [
