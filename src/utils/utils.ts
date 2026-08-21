@@ -1,7 +1,7 @@
-// %======================== utils ========================% //
-
 import { BACKEND_URL } from '@/constants/const';
 import { API_Route } from '@/constants/enums';
+
+// %======================== utils ========================% //
 
 export const splitTextToParagraphs = (text: string) => text.split('\n').filter(Boolean);
 export const isEscapeKey = (event: KeyboardEvent) => event.key === 'Escape';
@@ -10,22 +10,11 @@ export const getRandomNumber = (min: number, max: number): number => Math.floor(
 
 export const toCamelCase = (str: string) => str.replace(/[-_](.)/g, (_, char: string) => char.toUpperCase());
 export const toKebabCase = (str: string): string => str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-
-// %------------------------ generate paths for images ------------------------% //
-export const generatePaths = (basePath: string, endPaths: string[], extension?: string): Record<string, string> => {
-  return endPaths.reduce(
-    (acc, endPath) => {
-      const formattedPath = extension ? `${endPath}${extension}` : endPath;
-      acc[toCamelCase(endPath.replace(/\.[^.]+$/, ''))] = `${basePath}/${formattedPath}`;
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
-};
-
-// %------------------------ adapt values ------------------------% //
-export const toVW = (value: number, vp: number) => (value / vp) * window.innerWidth;
-export const vwm = (max: number, min: number, vp: number) => Math.max(toVW(max, vp), min);
+export const toSnakeCase = (str: string) =>
+  str
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/-/g, '_')
+    .toLowerCase();
 
 // %------------------------ work with arrays ------------------------% //
 export const getRandomArrayElements = <T>(array: T[], count: number): T[] => {
@@ -126,12 +115,4 @@ export const getApiData = async <T>({ route, slug }: { route: API_Route; slug?: 
   const json: unknown = await response.json();
 
   return convertKeysToCamelCase(json) as T;
-};
-
-export const getOrderUrl = (address: string) => {
-  const url = new URL('https://dev.weba.net/zayavka/');
-
-  url.searchParams.set('address', address);
-
-  return url.toString();
 };

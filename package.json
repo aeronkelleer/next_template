@@ -8,9 +8,7 @@
     "watch:images": "node scripts/watch-images.mjs",
     "generate:images": "node scripts/generate-images.mjs",
     "prebuild": "npm run clean && npm run generate:images",
-    "build": "npm run build:compile && npm run build:env",
-    "build:compile": "cross-env NODE_OPTIONS=--max-old-space-size=1024 next build --webpack --experimental-build-mode=compile",
-    "build:env": "next build --webpack --experimental-build-mode=generate-env",
+    "build": "next build",
     "start": "next start",
     "lint": "npm run clean && eslint .",
     "lint:fix": "eslint . --fix"

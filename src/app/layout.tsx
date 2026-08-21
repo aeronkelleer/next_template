@@ -3,18 +3,16 @@ import '@/styles/index.scss';
 
 // $======================== RootLayout ========================$ //
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang='en'
-    // className={`${inter.variable} ${unbounded.variable}`} // fonts
-    data-scroll-behavior="smooth"
+      // className={`${inter.variable}`} // fonts
+      data-scroll-behavior='smooth'
     >
       <body>
         {/* <Providers> */}
-        <Wrapper>
-          {children}
-        </Wrapper>
+        <Wrapper>{children}</Wrapper>
         {/* </Providers> */}
       </body>
     </html>
