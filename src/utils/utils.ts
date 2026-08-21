@@ -3,100 +3,39 @@ import { API_Route } from '@/constants/enums';
 
 // %======================== utils ========================% //
 
-export const splitTextToParagraphs = (text: string) => text.split('\n').filter(Boolean);
-export const isEscapeKey = (event: KeyboardEvent) => event.key === 'Escape';
+// %------------------------ case conversion ------------------------% //
+export const toCamelCase = (str: string) => str.replace(/[-_]+([a-zA-Z0-9])/g, (_, char: string) => char.toUpperCase());
 
-export const getRandomNumber = (min: number, max: number): number => Math.floor(Math.random() * (max - min) + min);
-
-export const toCamelCase = (str: string) => str.replace(/[-_](.)/g, (_, char: string) => char.toUpperCase());
-export const toKebabCase = (str: string): string => str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-export const toSnakeCase = (str: string) =>
-  str
-    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
-    .replace(/-/g, '_')
-    .toLowerCase();
-
-// %------------------------ work with arrays ------------------------% //
-export const getRandomArrayElements = <T>(array: T[], count: number): T[] => {
-  if (count >= array.length) return [...array];
-
-  const selected: T[] = [];
-  const indices = new Set<number>();
-
-  while (selected.length < count) {
-    const randomIndex = getRandomNumber(0, array.length);
-    if (!indices.has(randomIndex)) {
-      indices.add(randomIndex);
-      selected.push(array[randomIndex]);
-    }
-  }
-
-  return selected;
-};
-
-export const getItemsByField = <T, K extends keyof T>(array: T[], field: K, values: T[K][]): T[] =>
-  array.filter((item) => values.includes(item[field]));
-
-export const shuffleArray = <T>(array: T[]): T[] => {
-  return [...array].sort(() => Math.random() - 0.5);
-};
-
-export const multiplyArray = <T>(items: T[], amount: number): T[] =>
-  Array.from({ length: amount }, () => [...items]).flat();
-
-// %------------------------ extensions ------------------------% //
-export const extractExtension = (source: string) => {
-  const match = source.match(/\.[0-9a-z]+$/i);
-  return match ? match[0].slice(1) : '';
-};
-
-export const removeExtension = (path: string, extension: string): string => {
-  const extPattern = new RegExp(`\\.${extension}$`);
-  return path.replace(extPattern, '');
-};
-
-export const extractNumber = (str: string): number | null => {
-  const match = str.match(/[-+]?\d+([.,]\d+)?/);
-  return match ? parseFloat(match[0].replace(',', '.')) : null;
-};
-
-// %------------------------ convertKeysToCamelCase ------------------------% //
 export const convertKeysToCamelCase = (() => {
-  type CamelCasedKey<K extends string> = K extends `${infer A}_${infer B}${infer Rest}`
-    ? `${Lowercase<A>}${Capitalize<Lowercase<B>>}${CamelCasedKey<Rest>}`
-    : K extends `${infer A}-${infer B}${infer Rest}`
-      ? `${Lowercase<A>}${Capitalize<Lowercase<B>>}${CamelCasedKey<Rest>}`
+  type CamelCasedKey<K extends string> = K extends `${infer First}_${infer Rest}`
+    ? `${Lowercase<First>}${Capitalize<CamelCasedKey<Rest>>}`
+    : K extends `${infer First}-${infer Rest}`
+      ? `${Lowercase<First>}${Capitalize<CamelCasedKey<Rest>>}`
       : K;
 
-  type SnakeToCamelCase<T> =
-    T extends Array<infer U>
-      ? Array<SnakeToCamelCase<U>>
+  type CamelCaseObject<T> =
+    T extends Array<infer Item>
+      ? Array<CamelCaseObject<Item>>
       : T extends object
-        ? { [K in keyof T as K extends string ? CamelCasedKey<K> : K]: SnakeToCamelCase<T[K]> }
+        ? {
+            [K in keyof T as K extends string ? CamelCasedKey<K> : K]: CamelCaseObject<T[K]>;
+          }
         : T;
 
-  const convert = <T>(obj: T): SnakeToCamelCase<T> => {
+  const convert = <T>(obj: T) => {
     const inner = (input: unknown): unknown => {
       if (Array.isArray(input)) return input.map(inner);
 
-      if (input !== null && typeof input === 'object') {
-        return Object.keys(input).reduce(
-          (acc, key) => {
-            const value = (input as Record<string, unknown>)[key];
-            const camelKey = toCamelCase(key);
+      if (input === null || typeof input !== 'object') return input;
 
-            (acc as Record<string, unknown>)[camelKey] = inner(value);
+      return Object.entries(input).reduce<Record<string, unknown>>((acc, [key, value]) => {
+        acc[toCamelCase(key)] = inner(value);
 
-            return acc;
-          },
-          {} as Record<string, unknown>,
-        );
-      }
-
-      return input;
+        return acc;
+      }, {});
     };
 
-    return inner(obj) as SnakeToCamelCase<T>;
+    return inner(obj) as CamelCaseObject<T>;
   };
 
   return convert;
